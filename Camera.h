@@ -81,6 +81,38 @@ public:
 		c->rotateArbitrary(0,1,0,angle);
 	}//end spin()
 
+	void strafeLeft(){
+	  Vector3 etmp=*e;
+	  
+	  Vector3 dist=Vector3();
+	  dist.subtract(*d,*e);
+	  dist.normalize();
+	  
+	  Vector3 dir=Vector3();
+	  dir.cross(*up,dist);
+	  dir.normalize();
+	  
+	  e->add(dir);
+	  d->add(dir);
+	  setCam();
+	}
+	
+	void strafeRight(){
+	  Vector3 etmp=*e;
+	  
+	  Vector3 dist=Vector3();
+	  dist.subtract(*d,*e);
+	  dist.normalize();
+	  
+	  Vector3 dir=Vector3();
+	  dir.cross(*up,dist);
+	  dir.normalize();
+	  
+	  e->subtract(dir);
+	  d->subtract(dir);
+	  setCam();
+	}
+
 	void zoomIn(){
 	  Vector3 etmp=*e;
 

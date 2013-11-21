@@ -75,9 +75,9 @@ bool isAdjust=true;
 bool keepDrawing=false; //tell whether to redraw or not
 bool moveObject=true;
 bool isShader=false;
-
+bool isWaveShadOn=true;
 Shader* shad;
-
+Shader* tripShad, *waveShad;
 Fps* fps= new Fps();
 time_t startTime;
 float mytimer=0.0; // use for fake time counter
@@ -326,13 +326,13 @@ void drawPlane(){
   glColor3f(1,0,0);
 
   for(float y=-DIM; y<DIM; y+=DELTA){
-        glBegin(GL_TRIANGLE_STRIP);
-	//glBegin(GL_POINTS);glPointSize(1);
+    //glBegin(GL_TRIANGLE_STRIP);
+	glBegin(GL_POINTS);glPointSize(1);
     for(float x=-DIM; x<DIM; x+=DELTA){
       glNormal3f(0,1,0);      
-      //      glVertex2f(x,y);
-          glVertex3f(x,y,0);
-      glVertex3f(x,y+DELTA,0);
+            glVertex2f(x,y);
+	    //    glVertex3f(x,y,0);
+	    //glVertex3f(x,y+DELTA,0);
     }
     glEnd();
   }//end forx
@@ -343,16 +343,35 @@ void drawPlane(){
  
  void drawMiniScene(){
 
-   glColor3f(0,1,0);
+
  const float DIM=2000.0f;
   const float DELTA=DIM/100.0f;
 
 
   for(float y=-DIM/10; y<DIM/10; y+=10){
+    int xCount=0;
      for(float x=-DIM/10; x<DIM/10; x+=20){
+       xCount++;
        glPushMatrix();
        glTranslatef(x,y,0);
-       glutSolidSphere(1.5,20,20);
+       if(y>100){
+	 if(xCount==4){
+	   xCount=0;
+
+	   for(int z=0;z<100;z+=7){
+	   glPushMatrix();
+	   glTranslatef(0,0,z);
+	   glColor3f(0,0,1);
+	   glutSolidCube(7.0);
+	   glPopMatrix();
+	 }
+
+	 }
+       }
+       else{
+	 glColor3f(0,1,0);
+	 glutSolidSphere(1.5,20,20);
+       }
        glPopMatrix();
     }
   }//end forx

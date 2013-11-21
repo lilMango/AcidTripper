@@ -101,15 +101,6 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 
 	printf("pressed key %c\n",key);
 	switch(key){
-	case 'd'://dragon
-	  printf("shiny-diffuse\n");
-		objIdx=0;
-		//		camPtr->set(0,0,10,  0,0,0,	 0,1,0		); //e,d,up top front		
-		changeObj();
-
-		displayCallback();
-		Mobj2world->setIdentity();
-		break;
 	case 'h': //head
 	  printf("shiny\n");
 		objIdx=1;
@@ -153,6 +144,20 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 	  displayCallback();
 	  Mobj2world->setIdentity();
 	  break;
+	case 'e'://toggle wave and tripper shader
+	  isWaveShadOn=!isWaveShadOn;
+	  isShader=1;
+	  
+	  if(isWaveShadOn){
+	    shad=waveShad;
+	    printf("WaveShader:On\n");
+	  }else{
+	    mytimer=0;
+	    shad=tripShad;
+	    printf("TripShader:On\n");
+	  }
+	  shad->bind();
+	  break;
 	case 'x': //shader on
 	  isShader=!isShader;
 	  if(isShader){
@@ -178,6 +183,12 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 	  break;
 	case 's':
 	  camPtr->zoomOut();
+	  break;
+	case 'a':
+	  camPtr->strafeLeft();
+	  break;
+	case 'd':
+	  camPtr->strafeRight();
 	  break;
 	case 'r': //reset
 	  mytimer=0;
@@ -325,8 +336,11 @@ int main(int argc, char *argv[])
 
   char* dotVert="tripper.vert";
   char* dotFrag="tripper.frag";
-  
-  shad=new Shader(dotVert,dotFrag);
+  waveShad=new Shader("waves.vert","waves.frag");
+  tripShad=new Shader("tripper.vert","tripper.frag");
+
+  //  shad=new Shader(dotVert,dotFrag);
+  shad=waveShad;
   shad->bind();
 
 
