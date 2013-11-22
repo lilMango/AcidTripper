@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include<string>
 #include <stdlib.h>
 #include <iostream>
 #include <GLUT/glut.h>
@@ -6,8 +7,11 @@
 #include "objreader.h"
 #include "light.h"
 #include "shader.h"
+#include "SceneGraph.h"
+#include "CityBuilder.h"
 #include "fps.h"
 #include "SOIL.h"
+#include "Frustum.h"
 
 void parseOBJs();
 void mouseClick(int,int,int,int);
@@ -22,7 +26,7 @@ unsigned char* loadPPM(const char* filename, int& width, int& height);
 void loadTexture();
 
 using namespace std;
-#include<string>
+
 
 int pgmWidth,pgmHeight;
 
@@ -36,7 +40,7 @@ int *indices;
 double maxMagnitude;
 double * midPtr;
 
-
+Skyscraper *sc=new Skyscraper();
 
 //static Camera* camPtr=new Camera(-15,5,10,  -5,0,0,		 0,1,0.5		); //left corner top
 //static Camera* camPtr=new Camera(0,10,3,  0,10,2,	 0,1,0		); //camera for facing front OBJ drawings
@@ -86,6 +90,17 @@ float mytimer=0.0; // use for fake time counter
 const int NUM_TEXTURES=2;
 GLuint textures[NUM_TEXTURES];
 GLuint mytextureo;
+
+void setModelView(Matrix4 C){
+  //glLoadMatrixd((camPtr->getCameraMatrix().multiply(C)).transpose().getPointer());
+
+  Matrix4 CM=camPtr->getCameraMatrix();
+  //C=C.transpose();
+  //CM=CM.transpose();
+  CM=C*CM;
+  //CM=CM.transpose();
+  glLoadMatrixd(CM.getPointer());
+}
 
 
 //Parses through all the OBJ files and stores in an array
@@ -273,51 +288,6 @@ void drawCube(){
   glTexCoord2f(1, 0); glVertex3f(2, 1, 0);
   glTexCoord2f(0, 0); glVertex3f(-2, 1, 0);
   glEnd();
-  /*
-  // Draw front face:
-  glNormal3f(0.0, 0.0, 1.0);   
-  glVertex3f(-5.0,  5.0,  5.0);
-  glVertex3f( 5.0,  5.0,  5.0);
-  glVertex3f( 5.0, -5.0,  5.0);
-  glVertex3f(-5.0, -5.0,  5.0);
-    
-  // Draw left side:
-  glNormal3f(-1.0, 0.0, 0.0);
-  glVertex3f(-5.0,  5.0,  5.0);
-  glVertex3f(-5.0,  5.0, -5.0);
-  glVertex3f(-5.0, -5.0, -5.0);
-  glVertex3f(-5.0, -5.0,  5.0);
-    
-  // Draw right side:
-  glNormal3f(1.0, 0.0, 0.0);
-  glVertex3f( 5.0,  5.0,  5.0);
-  glVertex3f( 5.0,  5.0, -5.0);
-  glVertex3f( 5.0, -5.0, -5.0);
-  glVertex3f( 5.0, -5.0,  5.0);
-  
-  // Draw back face:
-  glNormal3f(0.0, 0.0, -1.0);
-  glVertex3f(-5.0,  5.0, -5.0);
-  glVertex3f( 5.0,  5.0, -5.0);
-  glVertex3f( 5.0, -5.0, -5.0);
-  glVertex3f(-5.0, -5.0, -5.0);
-  
-  // Draw top side:
-  glNormal3f(0.0, 1.0, 0.0);
-  glVertex3f(-5.0,  5.0,  5.0);
-  glVertex3f( 5.0,  5.0,  5.0);
-  glVertex3f( 5.0,  5.0, -5.0);
-  glVertex3f(-5.0,  5.0, -5.0);
-  
-  // Draw bottom side:
-  glNormal3f(0.0, -1.0, 0.0);
-  glVertex3f(-5.0, -5.0, -5.0);
-  glVertex3f( 5.0, -5.0, -5.0);
-  glVertex3f( 5.0, -5.0,  5.0);
-  glVertex3f(-5.0, -5.0,  5.0);
-  glEnd();
-  
-  */
 
 }//end drawCube()
 
@@ -360,13 +330,22 @@ void drawPlane(){
 	   xCount=0;
 
 	   for(int z=0;z<100;z+=7){
-	   glPushMatrix();
-	   glTranslatef(0,0,z);
-	   glColor3f(0,0,1);
-	   glutSolidCube(7.0);
-	   glPopMatrix();
-	 }
+	     glPushMatrix();
+	     glTranslatef(0,0,z);
+	     glColor3f(0,0,1);
+	     glutSolidCube(7.0);
+	     glPopMatrix();
+	     
+	     if(z==0){
 
+	       Matrix4 tm=Matrix4(1,0,0,0,
+				  0,1,0,0,
+				  0,0,1,0,
+				  0,0,0,1);
+	       sc->draw(tm);
+	     }
+	   }
+	   
 	 }
        }
        else{

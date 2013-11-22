@@ -10,8 +10,8 @@ void main()
 	float dist2;//distance squared
 	dist2 = position.z * position.z;
 
-	if(position.y < 500.0){
-		position.y += 50.0 * dist2/1000.0*time;
+	if(time < 5000.0){
+		position.y += 5.0 * dist2/1000.0*time;
 	}
 	float y = position.y;
 	float x = position.x;
