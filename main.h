@@ -75,9 +75,10 @@ bool isAdjust=true;
 bool keepDrawing=false; //tell whether to redraw or not
 bool moveObject=true;
 bool isShader=false;
-bool isWaveShadOn=true;
+int shaderIdx=0;
 Shader* shad;
-Shader* tripShad, *waveShad;
+Shader* tripShad, *waveShad, *inceptionShad;
+
 Fps* fps= new Fps();
 time_t startTime;
 float mytimer=0.0; // use for fake time counter

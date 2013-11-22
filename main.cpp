@@ -145,16 +145,21 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 	  Mobj2world->setIdentity();
 	  break;
 	case 'e'://toggle wave and tripper shader
-	  isWaveShadOn=!isWaveShadOn;
+	  shaderIdx++;
+	  if(shaderIdx>2)shaderIdx=0;
+
 	  isShader=1;
 	  
-	  if(isWaveShadOn){
+	  if(shaderIdx==0){
 	    shad=waveShad;
 	    printf("WaveShader:On\n");
-	  }else{
+	  }else if(shaderIdx==1){
 	    mytimer=0;
 	    shad=tripShad;
 	    printf("TripShader:On\n");
+	  }else{
+	    shad=inceptionShad;
+	    printf("InceptionShader:On\n");
 	  }
 	  shad->bind();
 	  break;
@@ -338,8 +343,8 @@ int main(int argc, char *argv[])
   char* dotFrag="tripper.frag";
   waveShad=new Shader("waves.vert","waves.frag");
   tripShad=new Shader("tripper.vert","tripper.frag");
+  inceptionShad=new Shader("inception.vert","inception.frag");
 
-  //  shad=new Shader(dotVert,dotFrag);
   shad=waveShad;
   shad->bind();
 
