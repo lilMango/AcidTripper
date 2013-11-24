@@ -18,7 +18,7 @@ void Sphere::draw(Matrix4 C){
   
   if(intersect == -1){//outside
     glColor3f(1,0,0);
-    if(SHOW_FRUSTUM)
+    if(DO_FRUSTUM_CULLING)
       glutSolidSphere(Sphere::radius,12,12);
   }
   else if(intersect == 0){//intersect
@@ -79,6 +79,79 @@ void Cape::draw(Matrix4 C){
       glNormal3f(0,-1,0);      
       glVertex3f(x,0,y);
       glVertex3f(x,0,y+DELTA);
+    }
+    glEnd();
+  }//end forx
+
+}
+
+
+void FrustumShape::draw(Matrix4 C){
+
+  if(!SHOW_FRUSTUM)return;
+  setModelView(C);
+  glColor3f(1,1,1);
+  
+
+  //  glPointSize(12.0); 
+  glLineWidth(12.0);
+  glBegin(GL_LINES);
+  glVertex3f(-20,0,0);
+  glVertex3f(20,0,0);
+  glEnd();
+  
+  //glScalef(.1,.1,.1);
+
+  
+  //near plane
+  glBegin(GL_LINE_STRIP);
+  glVertex3d((FRUSTUM->ntl)[0],(FRUSTUM->ntl)[1],(FRUSTUM->ntl)[2]);
+  glVertex3d((FRUSTUM->ntr)[0],(FRUSTUM->ntr)[1],(FRUSTUM->ntr)[2]);
+  glVertex3d((FRUSTUM->nbr)[0],(FRUSTUM->nbr)[1],(FRUSTUM->nbr)[2]);
+  glVertex3d((FRUSTUM->nbl)[0],(FRUSTUM->nbl)[1],(FRUSTUM->nbl)[2]);
+  glVertex3d((FRUSTUM->ntl)[0],(FRUSTUM->ntl)[1],(FRUSTUM->ntl)[2]);
+  glEnd();
+  //far plane
+  glBegin(GL_LINE_STRIP);
+  glVertex3d((FRUSTUM->ftl)[0],(FRUSTUM->ftl)[1],(FRUSTUM->ftl)[2]);
+  glVertex3d((FRUSTUM->ftr)[0],(FRUSTUM->ftr)[1],(FRUSTUM->ftr)[2]);
+  glVertex3d((FRUSTUM->fbr)[0],(FRUSTUM->fbr)[1],(FRUSTUM->fbr)[2]);
+  glVertex3d((FRUSTUM->fbl)[0],(FRUSTUM->fbl)[1],(FRUSTUM->fbl)[2]);
+  glVertex3d((FRUSTUM->ftl)[0],(FRUSTUM->ftl)[1],(FRUSTUM->ftl)[2]);
+  glEnd();
+
+  //connect plane
+  glBegin(GL_LINES);
+  glVertex3d((FRUSTUM->ntl)[0],(FRUSTUM->ntl)[1],(FRUSTUM->ntl)[2]);
+  glVertex3d((FRUSTUM->ftl)[0],(FRUSTUM->ftl)[1],(FRUSTUM->ftl)[2]);
+
+  glVertex3d((FRUSTUM->ntr)[0],(FRUSTUM->ntr)[1],(FRUSTUM->ntr)[2]);
+  glVertex3d((FRUSTUM->ftr)[0],(FRUSTUM->ftr)[1],(FRUSTUM->ftr)[2]);
+
+  glVertex3d((FRUSTUM->nbr)[0],(FRUSTUM->nbr)[1],(FRUSTUM->nbr)[2]);
+  glVertex3d((FRUSTUM->fbr)[0],(FRUSTUM->fbr)[1],(FRUSTUM->fbr)[2]);
+
+  glVertex3d((FRUSTUM->nbl)[0],(FRUSTUM->nbl)[1],(FRUSTUM->nbl)[2]);
+  glVertex3d((FRUSTUM->fbl)[0],(FRUSTUM->fbl)[1],(FRUSTUM->fbl)[2]);
+  glEnd();
+
+}//end class FrustumShape
+
+void SandPlane::draw(Matrix4 C){
+  setModelView(C);
+
+  const float DIM=500.0f;
+  const float DELTA=DIM/100.0f;
+  glColor3f(1,0,0);
+
+  for(float y=-DIM; y<DIM; y+=DELTA){
+    //glBegin(GL_TRIANGLE_STRIP);
+	glBegin(GL_POINTS);glPointSize(1);
+    for(float x=-DIM; x<DIM; x+=DELTA){
+      glNormal3f(0,1,0);      
+            glVertex2f(x,y);
+	    //    glVertex3f(x,y,0);
+	    //glVertex3f(x,y+DELTA,0);
     }
     glEnd();
   }//end forx

@@ -15,6 +15,7 @@ class Node{
  public:
   static Frustum* FRUSTUM;
   static int S_HELLO;
+  static bool DO_FRUSTUM_CULLING;
   static bool SHOW_FRUSTUM;
   string name;
   Node* parent;
@@ -205,3 +206,17 @@ class Cape:public Geode{
   }
   void draw(Matrix4 C);
 };//end class Cape
+
+class FrustumShape:public Geode{
+ public :
+  FrustumShape(){}
+  
+  void draw(Matrix4 C);
+};//end class FrustumShape
+
+class SandPlane:public Geode{
+ public:
+  SandPlane(){}
+
+  void draw(Matrix4 C);
+};//end class SandPlane

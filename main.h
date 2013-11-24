@@ -54,12 +54,11 @@ int shaderIdx=0;
 Shader* shad;
 Shader* tripShad, *waveShad, *inceptionShad;
 
-bool showFrustum=false;
 Frustum* frustum=new Frustum();
 int Node::S_HELLO=0;
 Frustum* Node::FRUSTUM=frustum;
+bool Node::DO_FRUSTUM_CULLING=false;
 bool Node::SHOW_FRUSTUM=false;
-
 MatrixTransform *world = new MatrixTransform();
 
 Fps* fps= new Fps();

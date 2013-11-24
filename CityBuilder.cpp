@@ -5,10 +5,10 @@ void Skyscraper::draw(Matrix4 C){
 
   int intersect= -1;
   intersect= FRUSTUM->sphereInFrustum(Vector3(C.get(3,0),C.get(3,1),C.get(3,2)), Skyscraper::width/2.0);
-  if(intersect <1) return;
-  glScalef(5,5,5);
+  if(intersect <0) return;
+  //  glScalef(5,5,5);
 
-  glColor3f(.3,.7,.5);
+  glColor3f(0,0,1);
   int deltaX=width>>2;
   int deltaY=depth>>2;
   int deltaZ=height>>2;

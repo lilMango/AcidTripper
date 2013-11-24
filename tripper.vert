@@ -9,6 +9,7 @@ void main()
 
 	float dist2;//distance squared
 	dist2 = position.x * position.x + position.z * position.z;
+	dist2= dist2 / 4.0;;
 	position.y += 5.0 * sin(dist2 * sin(time)/1000.0);
 	float y = position.y;
 	float x = position.x;

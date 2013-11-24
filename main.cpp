@@ -84,17 +84,21 @@ void buildSceneGraph()
 
   world->addChild(pos1);
   Skyscraper* skyscraper= new Skyscraper();
-
+ 
   Model3D* teapot=new Model3D(ObjMap["teapot.obj"]);
-     pos1->addChild(skyscraper);
-     //   pos1->addChild(teapot);
+  pos1->addChild(skyscraper);
+  //   pos1->addChild(teapot);
+  FrustumShape* frustumShape=new FrustumShape();
+  world->addChild(frustumShape);
+     
+
 
   sphere->rgb[0]=0;
   sphere->rgb[1]=0;
   sphere->rgb[2]=1;
 
-  const int MAX_ARMY=7;
-
+  const int MAX_ARMY=20;
+  /*
   for(int i=-MAX_ARMY*2;i<=MAX_ARMY*2;i++){
     for(int j=-MAX_ARMY;j<=MAX_ARMY;j++){
       for(int k=-MAX_ARMY*2;k<=MAX_ARMY;k++){
@@ -110,6 +114,23 @@ void buildSceneGraph()
     }
   }
 
+  */
+  for(int i=-MAX_ARMY*2;i<=MAX_ARMY*2;i++){
+    for(int j=-MAX_ARMY;j<=MAX_ARMY;j++){
+      Matrix4 M=Matrix4(1,0,0, i*8,
+			0,1,0, j*8,
+			0,0,1, 0,
+			0,0,0, 1);
+      MatrixTransform* pos=new MatrixTransform(M);
+      
+      subRoot->addChild(pos);
+      float tmpHeight = 5+rand() % 30;
+      pos->addChild(new Skyscraper(1, tmpHeight,4,4));
+    }
+  }
+
+  world->addChild(new SandPlane());
+  
 }//end buildSceneGraph()
 
 
@@ -256,8 +277,17 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 	  camPtr->reset();
 	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
 	  break;
-	case 'f': //show frustum culling
-	  Node::SHOW_FRUSTUM = !Node::SHOW_FRUSTUM;
+	case 'f': //do frustum culling
+	  Node::DO_FRUSTUM_CULLING = !Node::DO_FRUSTUM_CULLING;
+	  if(Node::DO_FRUSTUM_CULLING){
+	    printf("Frustum CUlling : ON\n");
+	  }
+	  else{
+	    printf("Frustum culling: off\n");
+	  }
+	  break;
+	case 'g': //show frustum
+	  Node::SHOW_FRUSTUM =! Node::SHOW_FRUSTUM;
 	  break;
 	}//end switch
 
