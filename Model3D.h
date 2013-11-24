@@ -8,8 +8,6 @@
 using namespace std;
 
 class Model3D:public Geode{
-  //  enum{MODERN,BLOCKY};
-  
  public:
 
   ReadOBJ readObj;

@@ -22,6 +22,7 @@ void drawPlane();
 void drawCape();
 void drawMiniScene();
 void drawObj();
+void buildSceneGraph();
 unsigned char* loadPPM(const char* filename, int& width, int& height);
 void loadTexture();
 
@@ -53,7 +54,16 @@ int shaderIdx=0;
 Shader* shad;
 Shader* tripShad, *waveShad, *inceptionShad;
 
+bool showFrustum=false;
+Frustum* frustum=new Frustum();
+int Node::S_HELLO=0;
+Frustum* Node::FRUSTUM=frustum;
+bool Node::SHOW_FRUSTUM=false;
+
+MatrixTransform *world = new MatrixTransform();
+
 Fps* fps= new Fps();
+
 time_t startTime;
 float mytimer=0.0; // use for fake time counter
 
@@ -62,7 +72,8 @@ GLuint textures[NUM_TEXTURES];
 GLuint mytextureo;
 
 void setModelView(Matrix4 C){
-
+  
+  glMatrixMode(GL_MODELVIEW);
   Matrix4 CM=camPtr->getCameraMatrix();
   //C=C.transpose();
   //CM=CM.transpose();
@@ -205,17 +216,17 @@ void drawCape(){
 }
 
  
- void drawMiniScene(){
+void drawMiniScene(){
 
 
- const float DIM=2000.0f;
+  const float DIM=2000.0f;
   const float DELTA=DIM/100.0f;
-
-
+  
+  
   for(float y=-DIM/10; y<DIM/10; y+=10){
     int xCount=0;
-     for(float x=-DIM/10; x<DIM/10; x+=20){
-       xCount++;
+    for(float x=-DIM/10; x<DIM/10; x+=20){
+      xCount++;
        glPushMatrix();
        glTranslatef(x,y,0);
        if(y>100){

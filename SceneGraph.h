@@ -1,54 +1,60 @@
 #pragma once
 #include <map>
 #include <string>
+#include <GLUT/glut.h>
 #include "VecMatrix4.h"
-#include "shader.h"
 #include <stdint.h>
+#include "shader.h"
+#include "Frustum.h"
 
 using namespace std;
 
 void setModelView(Matrix4 C);
 
 class Node{
-public:
-  //char * name;
+ public:
+  static Frustum* FRUSTUM;
+  static int S_HELLO;
+  static bool SHOW_FRUSTUM;
   string name;
-	Node* parent;
-	//bounding box
-	
-	~Node();
-	virtual void draw(Matrix4 C)=0;
+  Node* parent;
+  //bounding box
+  
+  ~Node(){};
+  virtual void draw(Matrix4 C)=0;
 };//end class Node
 
 class Group:public Node{
-public:
-	map <int,Node* > childMap;
+ public:
+  map <int,Node* > childMap;
 
-	Group(){
-		name="Group";
-	}
-
-	//add child
-	void addChild(Node * child){
-	  childMap[(intptr_t)child]=child;
-	};
-
-	//remove child
-	void removeChild(Node * child){
-	  childMap.erase((intptr_t)child);
-	};
-	void draw(Matrix4 C);
+  Group(){
+    name="Group";
+  }
+  
+  ~Group();
+  
+  //add child
+  void addChild(Node * child){
+    childMap[(intptr_t)child]=child;
+  };
+  
+  //remove child
+  void removeChild(Node * child){
+    childMap.erase((intptr_t)child);
+  };
+  void draw(Matrix4 C);
 };//end class Group
 
 class Geode:public Node{
-	public:
-                float rgb[3];
-                Shader* shad;
-		float boundingBoxRadius;
-		void findBound();
-		void setShader(Shader);
-		void draw(Matrix4 C);
-
+ public:
+  float rgb[3];
+  Shader* shad;
+  float boundingBoxRadius;
+  void findBound();
+  void setShader(Shader);
+  void draw(Matrix4 C);
+  
 };//end class Geode
 
 class MatrixTransform:public Group{
@@ -113,41 +119,6 @@ class Oscillate:public MatrixTransform{
 		void draw(Matrix4 C);
 
 };//end class Oscillate
-
-
-class Orbit:public MatrixTransform{
-	public:
-		int direction;
-		float theta;
-		int x,y,z;
-		Orbit(Matrix4 C,int x0,int y0,int z0,int range){
-			//M=new Matrix4();
-			M=C;
-			x=x0;y=y0;z=z0;
-			theta=1;
-			direction=1;
-		}//end constructor()
-
-		Orbit(Matrix4 C,int range){
-			//M=new Matrix4();
-			M=C;
-			theta=1;
-			direction=1;
-		}//end constructor()
-		Orbit(){
-			M=Matrix4();
-			theta=0;
-			direction=1;
-		}//end constructor()
-		Orbit(int dir){
-			M= Matrix4();
-			
-			theta=0;
-			direction=-1;
-		}//end constructor()
-		void draw(Matrix4 C);
-
-};//end class Orbit
 
 
 class Sphere:public Geode{

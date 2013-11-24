@@ -1,3 +1,4 @@
+#pragma once
 #include <math.h>   // include math functions, such as sin, cos, M_PI
 #include <cstdarg> //for variable arguments
 #include <iostream>
@@ -52,14 +53,17 @@ public:
 
 //	void operator - (Vector3 &a)		 {x-=a.x;y-=a.y;z-=a.z;}
 Vector3 operator - (Vector3 &a)		 {
-	x-=a.x;y-=a.y;z-=a.z;
-	return Vector3(x,y,z);
+  //	x-=a.x;y-=a.y;z-=a.z;
+	return Vector3(x-a.x,y-a.y,z-a.z);
 }
 	void negate()						 {x=-x;y=-y;z=-z;}
 	void negate(Vector3 &a)				 {x=-a.x;y=-a.y;z=-a.z;}
 	void scale(double s)					 {x*=s;y*=s;z*=s;}
 	void scale(double s,Vector3 &a)		 {x=s*a.x;y=s*a.y;z=s*a.z;}
 	double dot(Vector3 &a)				 {return x*a.x+y*a.y+z*a.z;}
+	double operator * (Vector3 &a){
+	  return dot(a);
+	}
 	void cross(Vector3 &a, Vector3 &b)   
 	{
 		x=a.y*b.z-a.z*b.y;
@@ -91,14 +95,18 @@ public:
 	double w;//scale factor
 
 	Vector4()							 {x=0.0;y=0.0;z=0.0; w=0.0;}
-	Vector4(double x0,double y0,double z0)  {x=x0;y=y0;z=z0; w=0;}
+	Vector4(double x0,double y0,double z0)  {x=x0;y=y0;z=z0; w=1;}
 	Vector4(double x0,double y0,double z0,double w0)  {x=x0;y=y0;z=z0; w=w0;}
-	Vector4(int arr[4]){
-	  x=arr[0];y=arr[1];z=arr[2];w=arr[3];
-	}
-
 	Vector4(const double arr[4])
 	{
+		x=arr[0];y=arr[1];z=arr[2];w=arr[3];
+	}
+	Vector4(const float arr[4])
+	{
+		x=arr[0];y=arr[1];z=arr[2];w=arr[3];
+	}
+
+	Vector4(int arr[4]){
 		x=arr[0];y=arr[1];z=arr[2];w=arr[3];
 	}
 	void set(int idx,double val){
@@ -159,12 +167,9 @@ public:
 
 	void subtract (Vector4 &a)				 {x-=a.x;y-=a.y;z-=a.z;w-=a.w;}
 	void subtract(Vector4 &a, Vector4 &b)	 {x=a.x-b.x;y=a.y-b.y;z=a.z-b.z; w=a.w-b.w;}
-	void operator - (Vector4 &a)		
+	Vector4 operator - (Vector4 &a)		
 	{
-		x-=a.x;
-		y-=a.y;
-		z-=a.z;
-		w-=a.w;
+		return Vector4(x-a.x,y-a.y,z-a.z,1);
 	}
 
 	void dehomogenize()						
@@ -189,7 +194,9 @@ public:
 	bool isVector()
 	{ return w==0.0;}
 
-
+	double operator * (Vector4 &a){
+	  return dot(a);
+	}
 	double dot(Vector4 &a)
 	{
 		return x*a.x+y*a.y+z*a.z+w*a.w;
@@ -227,6 +234,7 @@ public:
 		}//end for
 
 	}
+	
 	Matrix4(double arg[16]){
 	  int k=0;
 	  for(int i=0;i<4;i++){
@@ -237,6 +245,7 @@ public:
 	  }
 	}
 
+	
 	Matrix4(double arg[4][4]){
 	  for(int i=0;i<4;i++){
 		for(int j=0;j<4;j++){
@@ -251,17 +260,17 @@ public:
 			double a8,double a9,double a10,double a11,
 			double a12,double a13,double a14,double a15){
 
-	  /*  
+	  /*
 	       M[0][0]=a0;  M[1][0]=a1;   M[2][0]=a2;    M[3][0]=a3;
 		   M[0][1]=a4;  M[1][1]=a5;   M[2][1]=a6;    M[3][1]=a7;
 		   M[0][2]=a8;  M[1][2]=a9;   M[2][2]=a10;   M[3][2]=a11;
 		   M[0][3]=a12; M[1][3]=a13;  M[2][3]=a14;   M[3][3]=a15;
-*/
+	   */
 	       M[0][0]=a0;  M[0][1]=a1;   M[0][2]=a2;    M[0][3]=a3;
 		   M[1][0]=a4;  M[1][1]=a5;   M[1][2]=a6;    M[1][3]=a7;
 		   M[2][0]=a8;  M[2][1]=a9;   M[2][2]=a10;   M[2][3]=a11;
 		   M[3][0]=a12; M[3][1]=a13;  M[3][2]=a14;   M[3][3]=a15;
-
+	   
 
 	}
 	
@@ -411,14 +420,14 @@ public:
 	}//end translate
 
 	//this=a 
-    void assign(Matrix4 a) 
-    { 
+	void assign(Matrix4 a) 
+	{ 
 	  for (int i=0;i<4;i++){ 
-		for(int j=0;j<4;j++){ 
-		  set(i,j,a.get(i,j)); 
-		}//end for i 
+	    for(int j=0;j<4;j++){ 
+	      set(i,j,a.get(i,j)); 
+	    }//end for i 
 	  }//end for j 
-    }//end assign 
+	}//end assign 
 
 
 	//rotateArbitrary
@@ -437,10 +446,9 @@ public:
 				ax*ay*(1-cosf(theta))+az*sinf(theta),ay*ay+cosf(theta)*(1-ay*ay),ay*az*(1-cosf(theta))-ax*sinf(theta),0,
 				ax*az*(1-cosf(theta))-ay*sinf(theta),ay*az*(1-cosf(theta))+ax*sinf(theta),az*az+cosf(theta)*(1-az*az),0,
 				0,0,0,1);
-
-
-		assign(Ra.multiply(Matrix4(M)));
 		
+				//		assign(Ra.multiply(Matrix4(M)));
+		assign(Ra*Matrix4(M));
 
 	}//end rotateArbitrary
 
@@ -453,7 +461,7 @@ public:
 			0,0,0,1);
 			
 		assign(Sc.multiply(Matrix4(M)));
-
+		//assign(Matrix4(M)*Sc);
 	}//end scale
 
 	void translate(double tx,double ty,double tz)
@@ -497,7 +505,17 @@ public:
 		return res;
 	}//end transpose()
 
+	void copyRot(Matrix4 m){
 
+		for(int i=0;i<3;i++){
+		  for(int j=0;j<3;j++){
+		    M[i][j]=m.get(i,j);
+		  }
+		}
+	M[3][0]=M[3][1]=M[3][2]=0;
+	M[0][3]=M[1][3]=M[2][3]=0; M[3][3]=1;
+	}
+	
 	//http://harinadha.wordpress.com/tag/model-view-matrix-inverse/
 	/*
 
@@ -534,4 +552,58 @@ public:
 	  return T_inv.transpose()*R;
    
 	}//end inverseM()
+	
+
+	
+	void trackballRotation(int width,int height,int fromX,int fromY,int toX,int toY){
+	  const float TRACKBALL_SIZE=1.3f;
+	  float smallSize;
+	  float halfWidth=(float)width/2.0f,halfHeight=(float)height/2.0f;
+	  float d;//distance
+      
+      
+	  smallSize=halfWidth<halfHeight? halfWidth:halfHeight;
+	  Vector3 v1,v2;
+	  v1.set(0, ((float)fromX-halfWidth)/smallSize);
+	  v1.set(1, ((float)(height-fromY)-halfHeight)/smallSize);
+      
+	  v2.set(0, ((float)toX-halfWidth)/smallSize);
+	  v2.set(1, ((float)(height-toY)-halfHeight)/smallSize);
+
+	  d = sqrtf(v1[0]*v1[0]+v1[1]*v1[1]);
+	  v1.set(2, expf(-TRACKBALL_SIZE*d*d));
+	  d = sqrtf(v2[0]*v2[0]+v2[1]*v2[1]);
+	  v2.set(2, expf(-TRACKBALL_SIZE*d*d));
+
+
+	  //A dot B=ABcos theta=|A||B|cos theta 
+	  double magA=v1.magnitude(); 
+	  double magB=v2.magnitude(); 
+	  double AdotB=v1*v2; 
+
+	  //get cross product of start and end vector to get AXIS to revolve around 
+	  Vector3 vA;
+	  vA.cross(v1,v2); 
+	  vA.normalize(); 
+              
+	  //cos theta=(A dot B)/(|A||B|) 
+	  double theta=acos(AdotB/(magA*magB));//radians 
+	  theta=theta*180.00/3.14159;//degrees 
+	  theta=theta/20;//so trackball isn't so sensitive 
+	  
+	  Matrix4 mInv;
+	  mInv.setIdentity();
+	  mInv.copyRot(*this);
+	  //mInv=mInv.transpose();
+	  Vector4 vB;
+	  vB=(mInv*Vector4(vA[0],vA[1],vA[2],0));
+	  vB.normalize();
+	  rotateArbitrary(vB[0],vB[1],vB[2],-theta); 
+	  
+
+
+	   
+	}//end trackBallRotation()
+
+	
 };

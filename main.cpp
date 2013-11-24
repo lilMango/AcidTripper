@@ -62,6 +62,36 @@ glMatrixMode(GL_MODELVIEW);
 
 }//end drawObj()
 
+void buildSceneGraph()
+{
+  MatrixTransform *subRoot = new MatrixTransform();
+  world->addChild(subRoot);
+
+  Sphere* sphere=new Sphere(0.5);
+  //  Cube* cube=new Cube(3);
+  sphere->rgb[0]=0;
+  sphere->rgb[1]=0;
+  sphere->rgb[2]=1;
+
+  const int MAX_ARMY=7;
+
+  for(int i=-MAX_ARMY*2;i<=MAX_ARMY*2;i++){
+    for(int j=-MAX_ARMY;j<=MAX_ARMY;j++){
+      for(int k=-MAX_ARMY*2;k<=MAX_ARMY;k++){
+	Matrix4 M=Matrix4(1,0,0,i*4,
+			 0,1,0, j*4,
+			 0,0,1, k*4,
+			 0,0,0,1);
+	MatrixTransform* pos=new MatrixTransform(M);
+	pos->addChild(sphere);
+	//pos->addChild(cube);
+	subRoot->addChild(pos);
+      }
+    }
+  }
+
+}//end buildSceneGraph()
+
 
 void changeObj()
 {
@@ -84,7 +114,7 @@ void changeObj()
 	colors=objArr[objIdx].colors;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // clear color and depth buffers
-  drawObj();
+	drawObj();
 
 }//end changeObj
 
@@ -186,20 +216,28 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 	  break;
 	case 'w':
 	  camPtr->zoomIn();
+	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
 	  break;
 	case 's':
 	  camPtr->zoomOut();
+	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
 	  break;
 	case 'a':
 	  camPtr->strafeLeft();
+	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
 	  break;
 	case 'd':
 	  camPtr->strafeRight();
+	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
 	  break;
 	case 'r': //reset
 	  mytimer=0;
 	  Mobj2world->setIdentity();
 	  camPtr->reset();
+	  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
+	  break;
+	case 'f': //show frustum culling
+	  Node::SHOW_FRUSTUM = !Node::SHOW_FRUSTUM;
 	  break;
 	}//end switch
 
@@ -239,8 +277,8 @@ void Window::idleCallback(void)
   //    if(keepDrawing)
   displayCallback();    // call display routine to redraw cube
   
-		fps->update();
-
+  fps->update();
+		
 }
 
 //----------------------------------------------------------------------------
@@ -254,7 +292,7 @@ void Window::reshapeCallback(int w, int h)
   glLoadIdentity();//set to move w.r.t. origin
   //left,right,bottom,top,nearVal,farVal
   glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 1000.0); // set perspective projection viewing frustum
-  
+  frustum->setCamInternals(45.0, width/height, 10.0, 1000);
   glTranslatef(0, 0, -20);
   
   glMatrixMode(GL_MODELVIEW);
@@ -269,9 +307,14 @@ void Window::reshapeCallback(int w, int h)
 void Window::displayCallback(void)
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  // clear color and depth buffers
-  if(objIdx>=0 && objIdx<numObjs+2)
-  drawObj();
+  
+  if(objIdx>=0 && objIdx<numObjs+2){
+    //drawObj();
+    //drawSceneGraph();
+    world->draw((*Mobj2world));
+  }
 
+  
   glFlush();  
   glutSwapBuffers();
 
@@ -347,7 +390,7 @@ int main(int argc, char *argv[])
   inceptionShad=new Shader("inception.vert","inception.frag");
 
   shad=waveShad;
-  shad->bind();
+  //shad->bind();
 
 
   //initialize array of read objects
@@ -367,6 +410,11 @@ int main(int argc, char *argv[])
   }
 
   printf("GL VERSION:");  glGetString(GL_VERSION);
+
+  buildSceneGraph();
+  frustum->setCamDef(*(camPtr->e),*(camPtr->d),*(camPtr->up));
+  //  world->FRUSTUM = frustum;
+
   glutMainLoop();
 
   return 0;

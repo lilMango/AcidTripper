@@ -44,18 +44,18 @@ public:
 	}
 	void add (Vector3 &a)				 {x+=a.x;y+=a.y;z+=a.z;}
 	void add(Vector3 &a, Vector3 &b)	 {x=a.x+b.x;y=a.y+b.y;z=a.z+b.z;}
-	void operator + (Vector3 &a)		
+	Vector3 operator + (Vector3 a)		
 	{
-		x+=a.x;y+=a.y;z+=a.z;
+	  return Vector3(x+a.x, y+a.y, z+a.z);
 	}
 	void subtract(Vector3 &a)			 {x-=a.x;y-=a.y;z-=a.z;}
 	void subtract(Vector3 &a,Vector3 &b) {x=a.x-b.x;y=a.y-b.y;z=a.z-b.z;}
 
-//	void operator - (Vector3 &a)		 {x-=a.x;y-=a.y;z-=a.z;}
-Vector3 operator - (Vector3 &a)		 {
-  //	x-=a.x;y-=a.y;z-=a.z;
-	return Vector3(x-a.x,y-a.y,z-a.z);
-}
+
+	Vector3 operator - (Vector3 a)		 {
+	  return Vector3(x-a.x,y-a.y,z-a.z);
+	}
+
 	void negate()						 {x=-x;y=-y;z=-z;}
 	void negate(Vector3 &a)				 {x=-a.x;y=-a.y;z=-a.z;}
 	void scale(double s)					 {x*=s;y*=s;z*=s;}
@@ -70,7 +70,17 @@ Vector3 operator - (Vector3 &a)		 {
 		y=a.z*b.x-a.x*b.z;
 		z=a.x*b.y-a.y*b.x;
 	}
+	Vector3 cross(Vector3 b){
+  		double xn=y*b.z-z*b.y;
+		double yn=z*b.x-x*b.z;
+		double zn=x*b.y-y*b.x;
+		return Vector3(xn,yn,zn);
 
+	}
+	Vector3 operator * (double fa){
+	  return Vector3(x*fa, y*fa, z*fa);
+	}
+	
 	double magnitude()					 {return sqrt(x*x+y*y+z*z);}
 	void normalize()					
 	{
@@ -226,12 +236,10 @@ public:
 		for (int i=0;i<4;i++)
 		{
 		  for(int j=0;j<4;j++){
-			if(j==i)
-			  M[i][i]=1;
-			else
-			  M[i][j]=0;
+		    M[i][j]=0;
 		  }
 		}//end for
+		M[0][0]=M[1][1]=M[2][2]=M[3][3]=1.0f;
 
 	}
 	
