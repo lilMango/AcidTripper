@@ -33,6 +33,13 @@ void main(){
      float w2=17.0;
      float A1=.5;
      float A2=.7;
+     
+     //troll testing
+     k1=vec3(.9,.7,-.3);// k1=normalize(k1);
+     k2=vec3(.7,-.6,-.2);//k2=normalize(k2);
+     w1=80.0; w2=100.0;  //   A2=.2;A1=.1;
+     x=-(A1*sin(dot(k1,X_)-w1*time))*(A1*sin(dot(k1,X_)-w1*time));
+
      x=-(A1*sin(dot(k1,X_)-w1*time));
      x -= A2*sin(dot(k2,X_)-w2*time);
      y=A1*cos(dot(k1,X_)-w1*time);
@@ -53,7 +60,8 @@ void main(){
      NdotL = max(dot(normal,lightDir), 0.0);
 
      
-     vertex_color = vec3(0.82, 0.78, 0.67);
+     vertex_color = gl_Color.xyz;
+     //vertex_color = vec3(0.82, 0.78, 0.67); //sand color
      //vertex_color = vec3(0,0.3,0.5);     //ocean color
      gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * newPos;
 

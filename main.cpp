@@ -37,6 +37,7 @@ glMatrixMode(GL_MODELVIEW);
  else if(objIdx == 5)//sphere
    {
      drawPlane();
+     drawCape();
      drawMiniScene();
    }else{
 

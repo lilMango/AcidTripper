@@ -54,6 +54,7 @@ class MatrixTransform:public Group{
 
 		Matrix4 M;//
 
+		
 		MatrixTransform(Matrix4 C){
 			//M=new Matrix4();
 			M=C;
@@ -61,6 +62,17 @@ class MatrixTransform:public Group{
 		MatrixTransform(){
 			M=Matrix4();
 		}//end constructor()
+		
+		MatrixTransform(double a0,double a1,double a2,double a3,
+			double a4,double a5,double a6,double a7,
+			double a8,double a9,double a10,double a11,
+			double a12,double a13,double a14,double a15){
+
+		  M=Matrix4(a0,a1,a2,a3,
+			    a4,a5,a6,a7,
+			    a8,a9,a10,a11,
+			    a12,a13,a14,15);
+		}
 		void draw(Matrix4 C);
 		
 

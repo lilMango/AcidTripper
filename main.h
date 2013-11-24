@@ -4,7 +4,7 @@
 #include <iostream>
 #include <GLUT/glut.h>
 #include "Camera.h"
-#include "objreader.h"
+#include "ReadObj.h"
 #include "light.h"
 #include "shader.h"
 #include "SceneGraph.h"
@@ -13,13 +13,13 @@
 #include "SOIL.h"
 #include "Frustum.h"
 
-void parseOBJs();
 void mouseClick(int,int,int,int);
 void mouseDrag(int,int);
 void drawObj();
 void changeObj();
 void drawCube();
 void drawPlane();
+void drawCape();
 void drawMiniScene();
 void drawObj();
 unsigned char* loadPPM(const char* filename, int& width, int& height);
@@ -29,16 +29,6 @@ using namespace std;
 
 
 int pgmWidth,pgmHeight;
-
-////for readobj
-int nVerts=0;
-float *vertices;
-float *normals;
-float *texcoords;
-int nIndices=0;
-int *indices;
-double maxMagnitude;
-double * midPtr;
 
 Skyscraper *sc=new Skyscraper();
 
@@ -52,26 +42,6 @@ bool isScaling=false;
 float scaleFactor=1;
 int prevScaleDrag=0;//keep track of delta mouse drags
 
-//readOBJ* objArr=new readOBJ[5]; //each OBJ gets an object that has nVerts,vertices,etc...
-const int numObjs=4;
-char* objFileArray[]={"dragon_smooth.obj","head_n.obj","bunny_n.obj","teapot.obj"};
-
-struct ReadOBJ{
-  int nVerts;
-  float *vertices;
-  float *normals;
-  float *texcoords;
-  int nIndices;
-  int *indices;
-  double maxMagnitude; //the biggest magnitude of all vertices
-  double* maxVertex;//xyz 
-  double* minVertex;//xyz
-  char * fileName;
-  double* midPtr;
-  float * colors;
-};
- ReadOBJ* objArr=new ReadOBJ[numObjs];
-int objIdx=5;
 //ObjReader::readObj("teapot.obj", nVerts, &vertices, &normals, &texcoords, nIndices, &indices);
 float *colors;;//pointer to colors array
 bool isSpin=false;
@@ -92,7 +62,6 @@ GLuint textures[NUM_TEXTURES];
 GLuint mytextureo;
 
 void setModelView(Matrix4 C){
-  //glLoadMatrixd((camPtr->getCameraMatrix().multiply(C)).transpose().getPointer());
 
   Matrix4 CM=camPtr->getCameraMatrix();
   //C=C.transpose();
@@ -101,100 +70,6 @@ void setModelView(Matrix4 C){
   //CM=CM.transpose();
   glLoadMatrixd(CM.getPointer());
 }
-
-
-//Parses through all the OBJ files and stores in an array
-void parseOBJs()
-{
-	printf("Parsing ALL OBJ files....\n");
-	for(int k=0;k<numObjs;k++)
-	{
-
-		//int nVerts;
-		//float *vertices;
-		//float *normals;
-		//float *texcoords;
-		//int nIndices;
-		//int *indices;
-		//double maxMagnitude; //the biggest magnitude of all vertices
-		//double* maxVertex;//xyz 
-		//double* minVertex;//xyz
-		//char * fileName;
-
-		objArr[k].fileName=objFileArray[k];//assign file name to object
-		
-		//initialize each obj with OBJ attributes
-		ObjReader::readObj(objFileArray[k], objArr[k].nVerts, &(objArr[k].vertices), &(objArr[k].normals), 
-			&(objArr[k].texcoords), objArr[k].nIndices, &(objArr[k].indices));
-
-		nVerts=objArr[k].nVerts;
-		vertices=objArr[k].vertices;
-		normals=objArr[k].normals;
-		texcoords=objArr[k].texcoords;
-		nIndices=objArr[k].nIndices;
-		indices=objArr[k].indices;
-
-		objArr[k].colors= new float[nVerts*3];
-		for(int i=0;i<nVerts;i++){
-
-		  objArr[k].colors[i*3]=139.0f/256.0f;//rand()&1;
-		  objArr[k].colors[i*3+1]=119/256.0f;//rand()&1;
-		  objArr[k].colors[i*3+2]=101/256.0f;//rand()&1;
-		}
-
-
-		printf("======= ");
-		printf(objFileArray[k]);
-		printf(" =======:\n");
-		cout <<"nVerts:"<<nVerts <<" nIndices:"<<nIndices<<"\n";
-		
-
-		double* tmpMaxVertex=new double[3];;//xyz
-		double* tmpMinVertex=new double[3];;//xyz
-		double magnitudeArr[]={0,0,0,0,0}; 
-
-		tmpMaxVertex[0]=tmpMaxVertex[1]=tmpMaxVertex[2]=-1000000;
-		tmpMinVertex[0]=tmpMinVertex[1]=tmpMinVertex[2]=1000000;
-
-
-		float maxMagn=-100000;
-		float tmpMax=-100000;
-		int maxMagnIdx=-1;
-		 //find min/max xyz coordinates AND find vertex with largest magnitude
-  		for (int i = 0; i<nIndices; i++) {
-			if((objArr[k]).vertices[(objArr[k]).indices[i] * 3 + 0]>tmpMaxVertex[0]) tmpMaxVertex[0]=(objArr[k]).vertices[(objArr[k]).indices[i]*3+0]; //x max 
-			if((objArr[k]).vertices[(objArr[k]).indices[i] * 3 + 1]>tmpMaxVertex[1]) tmpMaxVertex[1]=(objArr[k]).vertices[(objArr[k]).indices[i]*3+1]; //y max
-			if((objArr[k]).vertices[(objArr[k]).indices[i] * 3 + 2]>tmpMaxVertex[2]) tmpMaxVertex[2]=(objArr[k]).vertices[(objArr[k]).indices[i]*3+2]; //x max
-
-			if(vertices[indices[i] * 3 + 0]<tmpMinVertex[0]) tmpMinVertex[0]=vertices[indices[i]*3+0]; //x min
-			if(vertices[indices[i] * 3 + 1]<tmpMinVertex[1]) tmpMinVertex[1]=vertices[indices[i]*3+1]; //y min
-			if(vertices[indices[i] * 3 + 2]<tmpMinVertex[2]) tmpMinVertex[2]=vertices[indices[i]*3+2]; //x min
-			
-			float x=vertices[indices[i] * 3 + 0];
-			float y=vertices[indices[i] * 3 + 1];
-			float z=vertices[indices[i] * 3 + 2];
-			
-			//find index with highest magnitude from vertex
-			Vector3* tmpVec=new Vector3(x,y,z);
-			tmpMax=tmpVec->magnitude();
-			if(tmpMax>maxMagn){
-				maxMagnIdx=i;
-				maxMagn=tmpMax;
-			}
-		}//end for i
-			printf("max x:%4.2f y:%4.2f z:%4.2f\n",tmpMaxVertex[0],tmpMaxVertex[1],tmpMaxVertex[2]);
-			printf("min x:%4.2f y:%4.2f z:%4.2f\n",tmpMinVertex[0],tmpMinVertex[1],tmpMinVertex[2]);
-			printf("max magnitude:%4.2f @ index:%d\n",maxMagn,maxMagnIdx);
-			objArr[k].maxMagnitude=maxMagn;
-			objArr[k].midPtr=new double[3];
-			objArr[k].midPtr[0]=(tmpMaxVertex[0]-tmpMinVertex[0])/2+tmpMinVertex[0];
-			objArr[k].midPtr[1]=(tmpMaxVertex[1]-tmpMinVertex[1])/2+tmpMinVertex[1];	
-			objArr[k].midPtr[2]=(tmpMaxVertex[2]-tmpMinVertex[2])/2+tmpMinVertex[2];
-			printf("midpoint(%4.2f,%4.2f,%4.2f)\n",objArr[k].midPtr[0],objArr[k].midPtr[1],objArr[k].midPtr[2]);
-			
-
-	}//end for k OBJfiles
-}//end parseOBJs
 
 class Window	  // output window related routines
 {
@@ -308,9 +183,27 @@ void drawPlane(){
     glEnd();
   }//end forx
   
- 
-}//end drawSphere()
+}//end drawPlane()
   
+void drawCape(){
+  glColor3f(1,0,0);
+  
+  const float DIM=30.0f;
+  const float DELTA=DIM/100.0f;
+  glColor3f(1,0,0);
+  int offset=10;
+  for(float y=0; y<DIM-2; y+=DELTA){
+    glBegin(GL_TRIANGLE_STRIP);
+    for(float x=-10.0+y/4.0; x<10.0-y/4.0; x+=DELTA){
+      glNormal3f(0,-1,0);      
+      glVertex3f(x-offset,0,y);
+      glVertex3f(x-offset,0,y+DELTA);
+    }
+    glEnd();
+  }//end forx
+  
+}
+
  
  void drawMiniScene(){
 
@@ -337,11 +230,11 @@ void drawPlane(){
 	     glPopMatrix();
 	     
 	     if(z==0){
-
+	       
 	       Matrix4 tm=Matrix4(1,0,0,0,
 				  0,1,0,0,
 				  0,0,1,0,
-				  0,0,0,1);
+				  0,0,5,1);
 	       sc->draw(tm);
 	     }
 	   }
