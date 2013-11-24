@@ -37,7 +37,7 @@ class ObjReader
 	}//end get indices
 
 
-	static void readObj(char* fileName, int &nVertices, float **vertices, float **normals, float **texcoords, int &nIndices, int **indices)
+	static void readObj(const char* fileName, int &nVertices, float **vertices, float **normals, float **texcoords, int &nIndices, int **indices)
 	{
 		FILE * fp = fopen(fileName,"r");
 		int nv=0, nn=0, nf=0, nt=0;

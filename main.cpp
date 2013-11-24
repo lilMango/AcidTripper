@@ -357,6 +357,15 @@ int main(int argc, char *argv[])
   //drawObj();
   time(&startTime);
   loadTexture();
+
+  //
+  printf("SHOWING MAP!!\n");
+
+  for(MAPOBJ_ITER iter= ObjMap.begin(); iter!=ObjMap.end();iter++){
+    string tmp= iter->first;
+    cout << "\t" << iter->first << "\tnVerts:" << (iter->second).nVerts << endl;
+  }
+
   printf("GL VERSION:");  glGetString(GL_VERSION);
   glutMainLoop();
 

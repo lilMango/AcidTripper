@@ -3,6 +3,8 @@
 #include <iostream>
 #include "VecMatrix4.h"
 #include "SceneGraph.h"
+#include "ReadObj.h"
+#include "Model3D.h"
 
 using namespace std;
 
@@ -14,6 +16,7 @@ class Skyscraper:public Geode{
   int height;
   int depth;
   int width;
+  bool useObj;
 
   Skyscraper(){
     printf("From Skyscraper\n");
@@ -21,7 +24,6 @@ class Skyscraper:public Geode{
     height = 128;
     depth = 16;
     width = 16;
-    
   }
   
   Skyscraper(int t,int h, int d, int w){

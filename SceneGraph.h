@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include <string>
 #include "VecMatrix4.h"
 #include "shader.h"
 #include <stdint.h>
@@ -10,7 +11,8 @@ void setModelView(Matrix4 C);
 
 class Node{
 public:
-	char * name;
+  //char * name;
+  string name;
 	Node* parent;
 	//bounding box
 	

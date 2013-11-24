@@ -4,7 +4,7 @@
 #include <iostream>
 #include <GLUT/glut.h>
 #include "Camera.h"
-#include "ReadObj.h"
+#include "ReadObjGlobals.h"
 #include "light.h"
 #include "shader.h"
 #include "SceneGraph.h"
