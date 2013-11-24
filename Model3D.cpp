@@ -4,17 +4,18 @@ void Model3D::draw(Matrix4 C){
   glPushMatrix();
 
   setModelView(C);
-
+  glColor3f(0,0,1);
   //set color
   glEnableClientState(GL_VERTEX_ARRAY); 
-  glEnableClientState(GL_COLOR_ARRAY); 
+  //  glEnableClientState(GL_COLOR_ARRAY); 
   
   glVertexPointer(3, GL_FLOAT, 0, readObj.vertices); 
-  glColorPointer(3, GL_FLOAT,0, readObj.colors); 
+  //  glColorPointer(3, GL_FLOAT,0, readObj.colors); 
   
-  glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_INT, readObj.indices); 
+  glDrawElements(GL_TRIANGLES, readObj.nVerts, GL_UNSIGNED_INT, readObj.indices); 
   glDisableClientState(GL_VERTEX_ARRAY); 
-  glDisableClientState(GL_COLOR_ARRAY); 
+  //  glDisableClientState(GL_COLOR_ARRAY); 
+
   
   /* 
 glBegin(GL_TRIANGLES); 

@@ -195,3 +195,13 @@ class RectPrism:public Geode{
 		void draw(Matrix4 C);
 };//end class Cube
 
+class Cape:public Geode{
+ public : 
+  float topWidth, bottomWidth, length;
+  Cape(float tw, float bw, float l){
+    topWidth=tw;
+    bottomWidth=bw;
+    length=l;
+  }
+  void draw(Matrix4 C);
+};//end class Cape

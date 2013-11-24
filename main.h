@@ -75,10 +75,7 @@ void setModelView(Matrix4 C){
   
   glMatrixMode(GL_MODELVIEW);
   Matrix4 CM=camPtr->getCameraMatrix();
-  //C=C.transpose();
-  //CM=CM.transpose();
   CM=C*CM;
-  //CM=CM.transpose();
   glLoadMatrixd(CM.getPointer());
 }
 

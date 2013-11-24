@@ -1,13 +1,18 @@
 #include "CityBuilder.h"
 
 void Skyscraper::draw(Matrix4 C){
-  glPushMatrix();
   setModelView(C);
 
-  glColor3f(.3,.2,.5);
+  int intersect= -1;
+  intersect= FRUSTUM->sphereInFrustum(Vector3(C.get(3,0),C.get(3,1),C.get(3,2)), Skyscraper::width/2.0);
+  if(intersect <1) return;
+  glScalef(5,5,5);
+
+  glColor3f(.3,.7,.5);
   int deltaX=width>>2;
   int deltaY=depth>>2;
   int deltaZ=height>>2;
+  deltaX=width/4;deltaY=depth/4;deltaZ=height/4;
   
   //front face
   for(int z=0; z<height-deltaZ; z+=deltaZ){
@@ -50,7 +55,6 @@ void Skyscraper::draw(Matrix4 C){
       glEnd();
   }
     
-  glPopMatrix();
 }
 
 void CityBuilder::build(){

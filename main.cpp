@@ -67,8 +67,28 @@ void buildSceneGraph()
   MatrixTransform *subRoot = new MatrixTransform();
   world->addChild(subRoot);
 
-  Sphere* sphere=new Sphere(0.5);
+  Sphere* sphere=new Sphere(1.0);
   //  Cube* cube=new Cube(3);
+  Cape* cape=new Cape(6,2,9);
+  MatrixTransform*pos0=new MatrixTransform(5,0,0,0,
+					   0,5,0,0,
+					   0,0,5,0,
+					   0,0,0,1);
+  //  world->addChild(pos0);
+  pos0->addChild(cape);
+
+  MatrixTransform*pos1=new MatrixTransform(2,0,0,0,
+					   0,2,0,0,
+					   0,0,2,0,
+					   0,0,0,1);
+
+  world->addChild(pos1);
+  Skyscraper* skyscraper= new Skyscraper();
+
+  Model3D* teapot=new Model3D(ObjMap["teapot.obj"]);
+     pos1->addChild(skyscraper);
+     //   pos1->addChild(teapot);
+
   sphere->rgb[0]=0;
   sphere->rgb[1]=0;
   sphere->rgb[2]=1;
@@ -292,7 +312,7 @@ void Window::reshapeCallback(int w, int h)
   glLoadIdentity();//set to move w.r.t. origin
   //left,right,bottom,top,nearVal,farVal
   glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 1000.0); // set perspective projection viewing frustum
-  frustum->setCamInternals(45.0, width/height, 10.0, 1000);
+  frustum->setCamInternals(120.0, width/height, 10.0, 1000);
   glTranslatef(0, 0, -20);
   
   glMatrixMode(GL_MODELVIEW);
