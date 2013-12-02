@@ -82,44 +82,13 @@ class MatrixTransform:public Group{
 			    a8,a9,a10,a11,
 			    a12,a13,a14,15);
 		}
+		void set(Matrix4 C){
+		  M=C;
+		}
 		void draw(Matrix4 C);
 		
 
 };//end class MatrixTransform
-
-class Oscillate:public MatrixTransform{
-	public:
-		int direction;
-		float theta;
-		int x,y,z;
-		Oscillate(Matrix4 C,int x0,int y0,int z0,int range){
-			//M=new Matrix4();
-			M=C;
-			x=x0;y=y0;z=z0;
-			theta=1;
-			direction=1;
-		}//end constructor()
-
-		Oscillate(Matrix4 C,int range){
-			//M=new Matrix4();
-			M=C;
-			theta=1;
-			direction=1;
-		}//end constructor()
-		Oscillate(){
-			M=Matrix4();
-			theta=0;
-			direction=1;
-		}//end constructor()
-		Oscillate(int dir){
-			M= Matrix4();
-			
-			theta=0;
-			direction=-1;
-		}//end constructor()
-		void draw(Matrix4 C);
-
-};//end class Oscillate
 
 
 class Sphere:public Geode{
@@ -220,3 +189,4 @@ class SandPlane:public Geode{
 
   void draw(Matrix4 C);
 };//end class SandPlane
+

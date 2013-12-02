@@ -12,7 +12,7 @@
 #include "fps.h"
 #include "SOIL.h"
 #include "Frustum.h"
-
+#include "MyWindow.h"
 void mouseClick(int,int,int,int);
 void mouseDrag(int,int);
 void drawObj();
@@ -31,17 +31,18 @@ using namespace std;
 
 int pgmWidth,pgmHeight;
 
-Skyscraper *sc=new Skyscraper();
+Building *oneBuilding=new Building(0,10,10,10);
 
 //static Camera* camPtr=new Camera(-15,5,10,  -5,0,0,		 0,1,0.5		); //left corner top
 //static Camera* camPtr=new Camera(0,10,3,  0,10,2,	 0,1,0		); //camera for facing front OBJ drawings
-static Camera* camPtr=new Camera(0,-1,5,  0,0,5,	 0,0,1		); //camera for facing front OBJ drawings
+static Camera* camPtr=new Camera(0,-1,7,  0,0,7,	 0,0,1		); //camera for facing front OBJ drawings
 Matrix4* Mobj2world=new Matrix4();
 bool isDragging=false;
 int prevXpix=0,prevYpix=0;
 bool isScaling=false;
 float scaleFactor=1;
 int prevScaleDrag=0;//keep track of delta mouse drags
+bool isPaused=false;
 
 //ObjReader::readObj("teapot.obj", nVerts, &vertices, &normals, &texcoords, nIndices, &indices);
 float *colors;;//pointer to colors array
@@ -49,15 +50,34 @@ bool isSpin=false;
 bool isAdjust=true;
 bool keepDrawing=false; //tell whether to redraw or not
 bool moveObject=true;
-bool isShader=false;
+bool isShader=true;
 int shaderIdx=0;
 Shader* shad;
 Shader* tripShad, *waveShad, *inceptionShad;
 
-Frustum* frustum=new Frustum();
+Light *pointLight = new Light(0, 10, 20,0,
+			      1,1,1,1);
+
+/*
+class Window	  // output window related routines
+{
+  public:
+    static int width, height; 	            // window size
+
+    static void idleCallback(void);
+    static void reshapeCallback(int, int);
+    static void displayCallback(void);
+    static void processNormalKeys(unsigned char,int,int);
+    static void processSpecialKeys(int,int,int);
+};
+
+ */
+int Window::width=512;int Window::height=512;
+
+Frustum* frustum=new Frustum(100.0, Window::width/Window::height, 10.0, 1000);
 int Node::S_HELLO=0;
 Frustum* Node::FRUSTUM=frustum;
-bool Node::DO_FRUSTUM_CULLING=false;
+bool Node::DO_FRUSTUM_CULLING=true;
 bool Node::SHOW_FRUSTUM=false;
 MatrixTransform *world = new MatrixTransform();
 
@@ -78,19 +98,6 @@ void setModelView(Matrix4 C){
   glLoadMatrixd(CM.getPointer());
 }
 
-class Window	  // output window related routines
-{
-  public:
-    static int width, height; 	            // window size
-
-    static void idleCallback(void);
-    static void reshapeCallback(int, int);
-    static void displayCallback(void);
-	static void processNormalKeys(unsigned char,int,int);
-	static void processSpecialKeys(int,int,int);
-};
-
-int Window::width=512;int Window::height=512;
 
 
 //---------------------------------------------------------------------------- 
@@ -232,7 +239,7 @@ void drawMiniScene(){
 	   for(int z=0;z<100;z+=7){
 	     glPushMatrix();
 	     glTranslatef(0,0,z);
-	     glColor3f(0,0,1);
+	     glColor3f(1,0,1);
 	     glutSolidCube(7.0);
 	     glPopMatrix();
 	     
@@ -242,7 +249,7 @@ void drawMiniScene(){
 				  0,1,0,0,
 				  0,0,1,0,
 				  0,0,5,1);
-	       sc->draw(tm);
+	       oneBuilding->draw(tm);
 	     }
 	   }
 	   

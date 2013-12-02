@@ -91,6 +91,8 @@ public:
 	  Vector3 dir=Vector3();
 	  dir.cross(*up,dist);
 	  dir.normalize();
+
+	  dir=dir*2.0;
 	  
 	  e->add(dir);
 	  d->add(dir);

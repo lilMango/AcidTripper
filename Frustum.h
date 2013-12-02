@@ -17,28 +17,9 @@ class Frustum{
   double nearD, farD, ratio, angle, tang;
   double nw, nh, fw,fh;
 
-  Frustum(){
-    ratio=16.0/9.0;
-    angle=90.0;
-    nearD=10;
-    farD=1000;
-
+  Frustum();
+  Frustum(double angle, double ratio, double nearD, double farD);
     
-    //compute width and height of near and far plane sections
-    tang = (double) tan(ANG2RAD * angle *.5);
-    printf("FFEGGGE %3.4f\n",tang);
-    nh = nearD* tang;
-    nw = nh * ratio;
-    fh = farD * tang;
-    fw = fh * ratio;    
-    /*
-    //this produces same result if angle -- 90
-    fh = 1000;
-    fw = fh * ratio;
-    nh = 10;
-    nw = nh * ratio;
-    */
-  };
   ~Frustum(){};
 
   //stores same parameters as gluPerspective

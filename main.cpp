@@ -77,17 +77,20 @@ void buildSceneGraph()
   //  world->addChild(pos0);
   pos0->addChild(cape);
 
-  MatrixTransform*pos1=new MatrixTransform(2,0,0,0,
-					   0,2,0,0,
-					   0,0,2,0,
+  MatrixTransform*pos1=new MatrixTransform(10,0,0,0,
+					   0,10,0,0,
+					   0,0,10,0,
 					   0,0,0,1);
 
   world->addChild(pos1);
-  Skyscraper* skyscraper= new Skyscraper();
+  Building* skyscraper= new Building();
  
   Model3D* teapot=new Model3D(ObjMap["teapot.obj"]);
-  pos1->addChild(skyscraper);
+  Road* road = new Road();
+  //pos1->addChild(skyscraper);
   //   pos1->addChild(teapot);
+  //  world->addChild(road);
+
   FrustumShape* frustumShape=new FrustumShape();
   world->addChild(frustumShape);
      
@@ -97,39 +100,30 @@ void buildSceneGraph()
   sphere->rgb[1]=0;
   sphere->rgb[2]=1;
 
-  const int MAX_ARMY=20;
-  /*
-  for(int i=-MAX_ARMY*2;i<=MAX_ARMY*2;i++){
-    for(int j=-MAX_ARMY;j<=MAX_ARMY;j++){
-      for(int k=-MAX_ARMY*2;k<=MAX_ARMY;k++){
-	Matrix4 M=Matrix4(1,0,0,i*4,
-			 0,1,0, j*4,
-			 0,0,1, k*4,
-			 0,0,0,1);
-	MatrixTransform* pos=new MatrixTransform(M);
-	pos->addChild(sphere);
-	//pos->addChild(cube);
-	subRoot->addChild(pos);
-      }
-    }
-  }
+  const int MAX_ARMY=0;
 
-  */
-  for(int i=-MAX_ARMY*2;i<=MAX_ARMY*2;i++){
+  for(int i=-MAX_ARMY;i<=MAX_ARMY;i++){
     for(int j=-MAX_ARMY;j<=MAX_ARMY;j++){
-      Matrix4 M=Matrix4(1,0,0, i*8,
-			0,1,0, j*8,
+      Matrix4 M=Matrix4(1,0,0, i*16,
+			0,1,0, j*16,
 			0,0,1, 0,
 			0,0,0, 1);
       MatrixTransform* pos=new MatrixTransform(M);
       
       subRoot->addChild(pos);
-      float tmpHeight = 5+rand() % 30;
-      pos->addChild(new Skyscraper(1, tmpHeight,4,4));
+      float tmpHeight = 8+rand() % 70;
+      pos->addChild(new Building(1, tmpHeight,8,8));
     }
   }
 
+  ////////////////////////////////////////////////////////  
+
   world->addChild(new SandPlane());
+  
+  CityBuilder* city = new CityBuilder();
+  city->build();
+    world->addChild(city);
+  //pos1->addChild(city);
   
 }//end buildSceneGraph()
 
@@ -170,9 +164,20 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 {
 
 
+  //        int mod = glutGetModifiers();
+	//	printf("\t mod:%d\n",mod);
+
 
 	printf("pressed key %c\n",key);
 	switch(key){
+	case '1'://point light
+	  pointLight->toggle();
+	  if(pointLight->isLightOn())printf("pointLight: ON\n");
+	  else printf("pointLight: off\n");
+	  break;
+        case 'p':
+	  isPaused=!isPaused;
+	  break;
 	case 'h': //head
 	  printf("shiny\n");
 		objIdx=1;
@@ -299,13 +304,18 @@ void Window::processNormalKeys(unsigned char key,int x,int y)
 //Process key events (ie F1, up)
 void Window::processSpecialKeys(int key,int x,int y)
 {
-	
+  printf("special:%d\n",key);
+  int mod = glutGetModifiers();
+  printf("\t mod:%d\n",mod);
+
 }//end processSpecialKeys()
 
 //----------------------------------------------------------------------------
 // Callback method called when system is idle.
 void Window::idleCallback(void)
 {
+  if(isPaused)return;
+
   mytimer+=.005;
   GLint myTime = glGetUniformLocationARB(shad->getPid(), "time");
   time_t timet;
@@ -323,7 +333,20 @@ void Window::idleCallback(void)
 
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  
+  glLoadIdentity();
+   // Generate light source:
+ if(pointLight->isLightOn())
+   glEnable(GL_LIGHT0);
+ else{
+   glDisable(GL_LIGHT0);
+ }
+ 
+
+ glLightfv(GL_LIGHT0, GL_POSITION, pointLight->getPosition());
+ //glLightfv(GL_LIGHT0, GL_AMBIENT, pointLight->color);
+ glLightfv(GL_LIGHT0, GL_DIFFUSE, pointLight->getColor());
+ glLightfv(GL_LIGHT0, GL_SPECULAR,pointLight->getColor());
+
   //    if(keepDrawing)
   displayCallback();    // call display routine to redraw cube
   
@@ -342,8 +365,7 @@ void Window::reshapeCallback(int w, int h)
   glLoadIdentity();//set to move w.r.t. origin
   //left,right,bottom,top,nearVal,farVal
   glFrustum(-10.0, 10.0, -10.0, 10.0, 10.0, 1000.0); // set perspective projection viewing frustum
-  frustum->setCamInternals(120.0, width/height, 10.0, 1000);
-  glTranslatef(0, 0, -20);
+  frustum->setCamInternals(frustum->angle, width/height, 10.0, 1000);
   
   glMatrixMode(GL_MODELVIEW);
 }
@@ -361,7 +383,7 @@ void Window::displayCallback(void)
   if(objIdx>=0 && objIdx<numObjs+2){
     //drawObj();
     //drawSceneGraph();
-    world->draw((*Mobj2world));
+      world->draw((*Mobj2world));
   }
 
   
@@ -380,7 +402,7 @@ int main(int argc, char *argv[])
   float blue[]={0,0,1,1};
 
   float shininess[] = {100.0};
-  float point_position[]  = {-10.0, 10.0, 10.0, 0.0};	// lightsource position
+  float point_position[]  = {0.0, 10.0, 15.0, 1.0};	// lightsource position
   float spot_position[] = {10,10,10,0};
   float dir_position[] = {0,10,5,0};
 
@@ -412,9 +434,8 @@ int main(int argc, char *argv[])
 
   glEnable(GL_LIGHTING);
   glEnable(GL_LIGHT0);
-  glEnable(GL_LIGHT1);
-  glEnable(GL_LIGHT2);
-
+  glLightfv(GL_LIGHT0, GL_POSITION, pointLight->getPosition());
+  
   glEnable(GL_NORMALIZE);
 
   glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
@@ -440,7 +461,7 @@ int main(int argc, char *argv[])
   inceptionShad=new Shader("inception.vert","inception.frag");
 
   shad=waveShad;
-  //shad->bind();
+  shad->bind();
 
 
   //initialize array of read objects

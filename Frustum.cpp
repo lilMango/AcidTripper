@@ -1,5 +1,46 @@
 #include "Frustum.h"
 
+Frustum::Frustum(){
+  ratio=16.0/9.0;
+    angle=120.0;
+    nearD=10;
+    farD=1000;
+
+    
+    //compute width and height of near and far plane sections
+    tang = (double) tan(ANG2RAD * angle *.5);
+    printf("FFEGGGE %3.4f\n",tang);
+    nh = nearD* tang;
+    nw = nh * ratio;
+    fh = farD * tang;
+    fw = fh * ratio;    
+    /*
+    //this produces same result if angle -- 90
+    fh = 1000;
+    fw = fh * ratio;
+    nh = 10;
+    nw = nh * ratio;
+    */
+}//end Frustum()
+
+Frustum::Frustum(double angle, double ratio, double nearD, double farD){
+  this->ratio=ratio;
+  this->angle=angle;
+  this->nearD = nearD;
+  this->farD = farD;
+
+  //compute width and height of near and far plane sections
+  tang = (double) tan(ANG2RAD * angle *.5);
+  printf("FFEGGGE %3.4f\n",tang);
+  nh = nearD* tang;
+  nw = nh * ratio;
+  fh = farD * tang;
+  fw = fh * ratio;    
+    
+}//end Frustum(args * 4);
+
+
+
 //Takes parameters of gluPerspective
 void Frustum::setCamInternals(double angle, double ratio, double nearD, double farD){
   this->ratio=ratio;
@@ -89,6 +130,19 @@ void Frustum::setCamDef(Vector3 e, Vector3 d, Vector3 up){
 }//end setCamDef
 
 
+int Frustum::pointInFrustum(Vector3 p){
+  int result = 1;//inside
+  
+  for(int i=0; i < 6; i++){
+    //TODO could use -1,1 unit cube and multiply projection_inv to get ModeViewl vertex
+    if(pl[i].distance(p) < 0)
+      return -1;//OUTSIDE;
+    
+  }
+
+  return result;
+  
+}//end pointInFrustum
 
 int Frustum::sphereInFrustum(Vector3 p, double rad){
   

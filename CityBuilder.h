@@ -5,38 +5,63 @@
 #include "SceneGraph.h"
 #include "ReadObj.h"
 #include "Model3D.h"
+#include <algorithm>
+#include <cstdlib>
 
 using namespace std;
 
-class Skyscraper:public Geode{
+class Building:public Geode{
   //  enum{MODERN,BLOCKY};
   
  public:
   int tiers;
   int height;
-  int depth;
+  int length;
   int width;
   bool useObj;
+  int largestDim;
 
-  Skyscraper(){
-    printf("From Skyscraper\n");
+  Building(){
+    printf("From Building\n");
     tiers=1;
     height = 128;
-    depth = 16;
+    length = 16;
     width = 16;
+    
+    largestDim = (width>length)?width:length;;
+    
   }
   
-  Skyscraper(int t,int h, int d, int w){
-    tiers=t; height=h; depth=d; width=w;
+  Building(int t,int h, int l, int w){
+    tiers=t; height=h; length = l; width=w;
+    largestDim = (width>length)?width:length;
   }
 
   void draw(Matrix4 C);
 };
 
-class CityBuilder{
+class Road:public Geode{
+ public:
+  int width;
+  int length;
+  Road(){
+    width = 8;
+    length = 128;
+  }
+  
+  Road(int w,int l){
+    width = w;
+    length = l;
+  }
+
+  void draw(Matrix4 C);
+};
+
+
+class CityBuilder:public MatrixTransform{
  public:
   int dim;
-  int cityBlockSize;
+  int gridSize;
   int density;//how packed you want the buildings to be [0,100] 100 being really packed
   int towerFreq;//frequency of big towers [0,100] 100 being all big skyscrapers
   int maxHeight;
@@ -44,12 +69,18 @@ class CityBuilder{
 
   CityBuilder(){
     dim = 1024;
-    cityBlockSize = 128;
+    gridSize = 128;
     density = 75;
     towerFreq = 25;
     maxHeight = 70;
-    streetWidth = 4;
+    streetWidth = 8;
+    M=Matrix4(1,0,0,0,
+	      0,1,0,0,
+	      0,0,1,0,
+	      0,0,0,1);
+
   }
+  void draw(Matrix4 C);
   void build();
 };
 

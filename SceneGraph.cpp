@@ -89,6 +89,9 @@ void Cape::draw(Matrix4 C){
 void FrustumShape::draw(Matrix4 C){
 
   if(!SHOW_FRUSTUM)return;
+
+  glPushMatrix();
+  glDisable(GL_LIGHTING);
   setModelView(C);
   glColor3f(1,1,1);
   
@@ -134,7 +137,7 @@ void FrustumShape::draw(Matrix4 C){
   glVertex3d((FRUSTUM->nbl)[0],(FRUSTUM->nbl)[1],(FRUSTUM->nbl)[2]);
   glVertex3d((FRUSTUM->fbl)[0],(FRUSTUM->fbl)[1],(FRUSTUM->fbl)[2]);
   glEnd();
-
+  glPopMatrix();
 }//end class FrustumShape
 
 void SandPlane::draw(Matrix4 C){
